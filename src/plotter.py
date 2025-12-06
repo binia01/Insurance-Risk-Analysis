@@ -1,3 +1,4 @@
+import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -36,3 +37,29 @@ class EDAPlotter:
         plt.plot([0, self.df['TotalPremium'].max()], [0, self.df['TotalPremium'].max()], 'r--', label='Break-even')
         plt.legend()
         plt.show()
+
+    def get_comprehensive_stats(self, columns=['TotalPremium', 'TotalClaims']):
+        """
+        Generates a detailed statistical summary for key financial variables.
+        Returns a DataFrame with Mean, Median, Std Dev, Skewness, Kurtosis, etc.
+        """
+        stats_dict = {}
+        
+        for col in columns:
+            if col in self.df.columns:
+                series = self.df[col]
+                stats_dict[col] = {
+                    'Count': series.count(),
+                    'Mean': series.mean(),
+                    'Median': series.median(),
+                    'Standard Deviation': series.std(),
+                    'Variance': series.var(),
+                    'Min': series.min(),
+                    'Max': series.max(),
+                    'Range': series.max() - series.min(),
+                    'Skewness': series.skew(),   # Critical for Insurance (Right-skewed)
+                    'Kurtosis': series.kurt(),   # Critical for "Fat Tails" (Extreme events)
+                    'CV (Variability)': series.std() / series.mean() if series.mean() != 0 else 0
+                }
+        
+        return pd.DataFrame(stats_dict)
